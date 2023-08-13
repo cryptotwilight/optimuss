@@ -34,7 +34,9 @@ contract Optimal is IOptimal {
     enum AttestationAction{ ADD, REMOVE, LOCK, UNLOCK}
     bytes32 attestationSchema; 
 
-    constructor(address _ownerAccount, address _owningNFTContract, uint256 _owningNFT, address _attestationServiceAddress, bytes32 _attestationSchema) {
+    constructor(address _ownerAccount, address _owningNFTContract, 
+                uint256 _owningNFT, address _attestationServiceAddress, 
+                bytes32 _attestationSchema) {
         owner               = _ownerAccount; 
         nftContract         = _owningNFTContract; 
         nftId               = _owningNFT; 
@@ -171,19 +173,22 @@ contract Optimal is IOptimal {
                                                                               data : revocationData_ });
         attestationService.revoke(revocationRequest_);
        
+       uint64 expiryTime_ = uint64(block.timestamp) + uint64(DEFAULT_ATTESTATION_EXPIRY);
+
         // create a new attestation
         AttestationRequestData memory attestationData_ = AttestationRequestData({
-                    recipient : msg.sender, // The recipient of the attestation.
-                    expirationTime : uint64(block.timestamp + DEFAULT_ATTESTATION_EXPIRY), // The time when the attestation expires (Unix timestamp).
-                    revocable : true,  // Whether the attestation is revocable.
-                    refUID : 0x0000000000000000000000000000000000000000000000000000000000000000, // The UID of the related attestation.
-                    data : getOptimalAttestationData(), // Custom attestation data.
-                    value : 0 
-        });
+                                                                                    recipient       : msg.sender, // The recipient of the attestation.
+                                                                                    expirationTime  : expiryTime_, // The time when the attestation expires (Unix timestamp).
+                                                                                    revocable       : true,  // Whether the attestation is revocable.
+                                                                                    refUID          : bytes32(0x0000000000000000000000000000000000000000000000000000000000000000), // The UID of the related attestation.
+                                                                                    data            : getOptimalAttestationData(), // Custom attestation data.
+                                                                                    value           : 0 
+                                                                        });
         
         AttestationRequest memory attestationRequest_ = AttestationRequest({ schema : attestationSchema, 
                                                                             data : attestationData_});
         uidHistory.push(attestationService.attest(attestationRequest_));
+        
         return true; 
     }
 
@@ -193,8 +198,10 @@ contract Optimal is IOptimal {
                                                                     assetCount  : getAssetCount(),
                                                                     assetsHash  : getAssetsHash(), 
                                                                     updatedAt   : block.timestamp
-                                                            }); 
+                                                                    }); 
+
         _optimalAttestationData = abi.encode(oad_.locked, oad_.assetCount, oad_.assetsHash, oad_.updatedAt);
+        
         return _optimalAttestationData; 
     }
 
@@ -214,33 +221,29 @@ contract Optimal is IOptimal {
 
      function getAssetsHash() view internal returns (bytes32 _assetsHash) {
         
-        uint256 y = 0; 
-        string memory hashBase_ = "";
+        
         for(uint256 x = 0; x < assetIds.length; x++){
             uint256 aId_ = assetIds[x];
             if(!isRemoved[aId_]) {
                 Asset memory asset_ = assetById[aId_];
-                string memory str_ = convertAssetToString(asset_);
-                hashBase_ = concat(hashBase_, concat("-", str_));
-                y++;
+                bytes32 assetHash_ =  convertAssetToHash(asset_);
+                _assetsHash = keccak256(abi.encode(_assetsHash, assetHash_));
             }
         }
-        _assetsHash = toHash(hashBase_);
+        
         return _assetsHash; 
     }
 
-
-    function convertAssetToString(Asset memory _asset) pure internal returns (string memory _assetString) {
-        string memory tokenContract_ = Strings.toHexString(_asset.assetContract); 
-        string memory assetType_ = Strings.toString(uint(_asset.assetType));
-        string memory assetId_ = Strings.toString(_asset.assetId);
-        string memory assetQuantity_ = Strings.toString(_asset.quantity);
-        _assetString = string(abi.encodePacked(assetType_, "-",tokenContract_,"-",assetType_,"-", assetId_, "-",assetQuantity_));
-        return _assetString; 
-    } 
+    function convertAssetToHash(Asset memory _asset) pure internal returns (bytes32 _hash){
+        _hash = keccak256(abi.encode(_asset));
+        return _hash; 
+    }
 
     function getAssetCount() view internal returns (uint256 _count) {
-        return assetIds.length - removedAssetIds.length; 
+        if(assetIds.length > 0){
+            return assetIds.length - removedAssetIds.length; 
+        }
+        return 0;
     }
 
     function getLatestUid() view internal returns (bytes32 _uid){

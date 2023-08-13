@@ -1,11 +1,13 @@
-//SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.8.2 <0.9.0;
 
+import "./Optimal.sol";
+
+import "../interfaces/IOptimalFactory.sol";
+import "../interfaces/IOptimusTokenBoundAccountFactory.sol";
 import "../interfaces/IOptimusERC6551Plant.sol";
 
-import "./Optimal.sol";
-import "../interfaces/IOptimusTokenBoundAccountFactory.sol";
 
 contract OptimusERC6551Plant is IOptimusERC6551Plant { 
 
@@ -14,7 +16,9 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
     address attestationService; 
     bytes32 attestationSchema; 
     uint256 chainId; 
-    IOptimusTokenBoundAccountFactory factory; 
+
+    IOptimusTokenBoundAccountFactory tbaFactory; 
+    IOptimalFactory optimalFactory;
 
     mapping(address=>mapping(uint256=>address)) tokenBoundAccountByNftIdByTokenContract;  
 
@@ -25,13 +29,15 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
     mapping(address=>bool) hasOptimalByTokenBoundAccount; 
     mapping(address=>mapping(uint256=>bool)) hasTokenBoundAccountByNftIdByTokenContract; 
 
-    constructor(address _factory, uint256 _chainId, address _owner, address _attestationService, bytes32 _attestationSchema) {
-        owner = _owner; 
-        self = address(this);
-        attestationService = _attestationService; 
-        attestationSchema = _attestationSchema; 
-        chainId = _chainId; 
-        factory = IOptimusTokenBoundAccountFactory(_factory);
+
+    constructor(address _tbaFactory, address _optimalFactory, uint256 _chainId, address _owner, address _attestationService, bytes32 _attestationSchema) {
+        tbaFactory          = IOptimusTokenBoundAccountFactory(_tbaFactory);
+        optimalFactory      = IOptimalFactory(_optimalFactory);
+        owner               = _owner; 
+        attestationService  = _attestationService; 
+        attestationSchema   = _attestationSchema; 
+        chainId             = _chainId; 
+        self                = address(this);
     }
 
     function hasOptimal(address _tokenBoundAccount) view external returns (bool _hasTokenBoundAccount) {
@@ -47,21 +53,46 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
             return optimalByTokenBoundAccount[_tokenBoundAccount];
         }
         TokenBoundAccountDescriptor memory descriptor_ = tokenBoundAccountDescriptorByTokenBoundAccount[_tokenBoundAccount];
-        Optimal optimal_ = new Optimal(_tokenBoundAccount, descriptor_.tokenContract, descriptor_.nftId, attestationService, attestationSchema);
-        _optimal = address(optimal_);
+        _optimal = optimalFactory.getOptimal(_tokenBoundAccount, descriptor_.tokenContract, descriptor_.nftId, attestationService, attestationSchema);
         optimalByTokenBoundAccount[descriptor_.tokenBoundAccount] = _optimal; 
-        hasOptimalByTokenBoundAccount[_tokenBoundAccount] = true; 
+        hasOptimalByTokenBoundAccount[_tokenBoundAccount] = true;
         return _optimal; 
     }
 
     function getTokenBoundAccount(address _erc721, uint256 _nftId) external returns (address _tokenBoundAccount){
-        if(hasTokenBoundAccountByNftIdByTokenContract[_erc721][_nftId]) {
+       if(hasTokenBoundAccountByNftIdByTokenContract[_erc721][_nftId]) {
             return tokenBoundAccountByNftIdByTokenContract[_erc721][_nftId];
         }
-        _tokenBoundAccount = factory.getImplementation(chainId, _erc721, _nftId); 
+        _tokenBoundAccount = tbaFactory.getImplementation(chainId, _erc721, _nftId); 
         tokenBoundAccountByNftIdByTokenContract[_erc721][_nftId] = _tokenBoundAccount; 
         hasTokenBoundAccountByNftIdByTokenContract[_erc721][_nftId] = true; 
         return _tokenBoundAccount; 
     }
 
-}
+    function setAttestationSchema(bytes32 _schema) external returns (bool _set) {
+        onlyOwner();
+        attestationSchema = _schema; 
+        return true; 
+    }
+
+    function setTBAFactory(address _tbaFactory) external returns (bool) {
+        onlyOwner(); 
+        tbaFactory = IOptimusTokenBoundAccountFactory(_tbaFactory);
+        return true; 
+    }
+
+    function setOptimalFactory(address _optimalFactory) external returns (bool) {
+        onlyOwner(); 
+        optimalFactory = IOptimalFactory(_optimalFactory); 
+        return true; 
+    }
+
+//============================================================ INTERNAL ==========================================================
+
+
+    function onlyOwner() view internal returns (bool) {
+        require(msg.sender == owner, "only owner");
+        return true; 
+    }
+
+}S
