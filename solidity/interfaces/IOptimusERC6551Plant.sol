@@ -17,4 +17,7 @@ interface IOptimusERC6551Plant {
 
     function getTokenBoundAccount(address _erc721, uint256 _nftid) external returns (address _tokenBoundAccount);
 
+    function createOptimal(address _tokenBoundAccount) external returns (address _optimal);
+
+    function createTokenBoundAccount(address _erc721, uint256 _nftid) external returns (address _tokenBoundAccount);
 }

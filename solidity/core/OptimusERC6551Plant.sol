@@ -40,6 +40,20 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
         self                = address(this);
     }
 
+    function getOptimal(address _tokenBoundAccount) view external returns (address _optimal) {
+        if(hasOptimalByTokenBoundAccount[_tokenBoundAccount]) {
+            return optimalByTokenBoundAccount[_tokenBoundAccount];
+        }
+        return address(0);
+    }
+
+    function getTokenBoundAccount(address _erc721, uint256 _nftId) view external returns (address _tokenBoundAccount){
+        if(hasTokenBoundAccountByNftIdByTokenContract[_erc721][_nftId]) {
+            return tokenBoundAccountByNftIdByTokenContract[_erc721][_nftId];
+        }
+        return address(0);
+    }
+
     function hasOptimal(address _tokenBoundAccount) view external returns (bool _hasTokenBoundAccount) {
         return hasOptimalByTokenBoundAccount[_tokenBoundAccount];
     }
@@ -48,7 +62,7 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
         return hasTokenBoundAccountByNftIdByTokenContract[_tokenContract][_nftId];
     }
 
-    function getOptimal(address _tokenBoundAccount) external returns (address _optimal){
+    function createOptimal(address _tokenBoundAccount) external returns (address _optimal){
         if(hasOptimalByTokenBoundAccount[_tokenBoundAccount]) {
             return optimalByTokenBoundAccount[_tokenBoundAccount];
         }
@@ -59,7 +73,7 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
         return _optimal; 
     }
 
-    function getTokenBoundAccount(address _erc721, uint256 _nftId) external returns (address _tokenBoundAccount){
+    function createTokenBoundAccount(address _erc721, uint256 _nftId) external returns (address _tokenBoundAccount){
        if(hasTokenBoundAccountByNftIdByTokenContract[_erc721][_nftId]) {
             return tokenBoundAccountByNftIdByTokenContract[_erc721][_nftId];
         }
@@ -95,4 +109,4 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
         return true; 
     }
 
-}S
+}
