@@ -30,5 +30,5 @@ The architecture for Optimus is described in the diagram below:
 ## Links
 |Item | Link | 
 |------|-----|
-|Optimus Attestation Page |[UID:0x557d1add7ee9c61d2d0f2e5c715e7f459857afd214c4494f100e613738e19193](https://optimism-goerli-bedrock.easscan.org/schema/view/0x24aa43f2eaa97aa8478f2f3197f541e84737370f1358cd0ad98ea70bc49e97e7) |
+|Optimus Attestation Page |[UID:0x24aa43f2eaa97aa8478f2f3197f541e84737370f1358cd0ad98ea70bc49e97e7](https://optimism-goerli-bedrock.easscan.org/schema/view/0x24aa43f2eaa97aa8478f2f3197f541e84737370f1358cd0ad98ea70bc49e97e7) |
 |Optimus UI | | 
