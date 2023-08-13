@@ -21,10 +21,10 @@ The architecture for Optimus is described in the diagram below:
 |Chain | Contract | Address |Description |
 |------|-----------|--------|------------|
 |Optimism Goerli |OptimusEASSchemaResolver|0x102081CB2C65233A12BF3060cffEc8a9861C0Eff|This is used by EAS to resolve the Optimus Attestation Schema|
-|Optimism Goerli |Test ERC721||This is the NFT contract used to test Optimus|
+|Optimism Goerli |Test ERC721|0x75F239B434F4Fc37ED53C8160C670110727CB564|This is the NFT contract used to test Optimus|
 |Optimism Goerli |OptimusERC6551Plant||This is used to create Token Bound Account and Optimal implementations |
 |Optimism Goerli |OptimusTokenBoundAccountFactory|0xBe385590107441E6073ec4435D6C521BB91618C1|This is the factory for Token Bound Accounts (only callable by the plant)|
-|Optimism Goerli |ERC6551Registry||This is the registry for token bound accounts |
+|Optimism Goerli |ERC6551Registry|0x4E8312378f6E51DE765A79e45dd65906c27ae622|This is the registry for token bound accounts |
 |||
 
 ## Links
@@ -32,3 +32,5 @@ The architecture for Optimus is described in the diagram below:
 |------|-----|
 |Optimus Attestation Page |[UID:0x557d1add7ee9c61d2d0f2e5c715e7f459857afd214c4494f100e613738e19193](https://optimism-goerli-bedrock.easscan.org/schema/view/0x557d1add7ee9c61d2d0f2e5c715e7f459857afd214c4494f100e613738e19193) |
 |Optimus UI | | 
+
+
