@@ -68,7 +68,7 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
         }
         TokenBoundAccountDescriptor memory descriptor_ = tokenBoundAccountDescriptorByTokenBoundAccount[_tokenBoundAccount];
         _optimal = optimalFactory.getOptimal(_tokenBoundAccount, descriptor_.tokenContract, descriptor_.nftId, attestationService, attestationSchema);
-        optimalByTokenBoundAccount[descriptor_.tokenBoundAccount] = _optimal; 
+        optimalByTokenBoundAccount[_tokenBoundAccount] = _optimal; 
         hasOptimalByTokenBoundAccount[_tokenBoundAccount] = true;
         return _optimal; 
     }
@@ -78,6 +78,13 @@ contract OptimusERC6551Plant is IOptimusERC6551Plant {
             return tokenBoundAccountByNftIdByTokenContract[_erc721][_nftId];
         }
         _tokenBoundAccount = tbaFactory.getImplementation(chainId, _erc721, _nftId); 
+        TokenBoundAccountDescriptor memory descriptor_ = TokenBoundAccountDescriptor({
+            tokenContract : _erc721,
+            nftId : _nftId, 
+            tokenBoundAccount : _tokenBoundAccount
+        });
+        tokenBoundAccountDescriptorByTokenBoundAccount[_tokenBoundAccount] = descriptor_;
+
         tokenBoundAccountByNftIdByTokenContract[_erc721][_nftId] = _tokenBoundAccount; 
         hasTokenBoundAccountByNftIdByTokenContract[_erc721][_nftId] = true; 
         return _tokenBoundAccount; 

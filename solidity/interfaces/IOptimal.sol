@@ -28,6 +28,10 @@ interface IOptimal {
 
     function getAssets() view external returns (Asset [] memory _assets);
 
+    function getAttestationService() view external returns (address _attestationService);
+
+    function getAttestationSchema() view external returns (bytes32 schema);
+
     function addAsset(Asset memory _asset) external returns (bool _added);
 
     function removeAsset(Asset memory _asset) external returns (bool _removed);

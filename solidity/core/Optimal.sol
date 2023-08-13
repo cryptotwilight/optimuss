@@ -57,6 +57,19 @@ contract Optimal is IOptimal {
         return getAssetsInternal(); 
     }
 
+    function getAttestationService() view external returns (address _attestationService){
+        return address(attestationService);
+    }   
+
+    function getAttestationSchema() view external returns (bytes32 schema){
+        return attestationSchema; 
+    }
+
+    function updateAttestationManual() external returns (bool _updated){
+        updateAttestation(); 
+        return true; 
+    }
+
     function addAsset(Asset memory _asset) external returns (bool _added){
         require(!locked, "optimal locked");
         require(!isKnownAssetByContractById[_asset.assetContract][_asset.assetId], "asset already added");
@@ -65,7 +78,7 @@ contract Optimal is IOptimal {
         uint256 aId_ = index++; 
         assetById[aId_] = _asset; 
         assetIds.push(aId_);
-        updateAttestation();
+        // updateAttestation();
         return true; 
     }
 
@@ -79,21 +92,21 @@ contract Optimal is IOptimal {
         removedAssetIds.push(aId_);
         isRemoved[aId_] = true; 
         transferAssetOut(_asset);
-        updateAttestation();
+        // updateAttestation();
         return true; 
     }
 
     function lock() external returns (bool _locked){
         onlyOwner(); 
         locked = true; 
-        updateAttestation(); 
+        // updateAttestation(); 
         return locked; 
     }
 
     function unlock() external returns (bool _unlocked){
         onlyOwner(); 
         locked = false; 
-        updateAttestation(); 
+        // updateAttestation(); 
         return locked; 
     }
 
